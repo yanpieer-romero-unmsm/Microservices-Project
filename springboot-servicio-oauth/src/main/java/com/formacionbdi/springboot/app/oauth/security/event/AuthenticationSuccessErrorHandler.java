@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Usuario;
-import com.formacionbdi.springboot.app.oauth.services.IUsuarioService;
+import com.formacionbdi.springboot.app.oauth.services.IUserService;
 
 import feign.FeignException;
 
@@ -21,7 +21,7 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 	private Logger log = LoggerFactory.getLogger(AuthenticationSuccessErrorHandler.class); 
 
 	@Autowired
-	private IUsuarioService usuarioService;
+	private IUserService usuarioService;
 	
 	@Autowired
 	private Environment env;

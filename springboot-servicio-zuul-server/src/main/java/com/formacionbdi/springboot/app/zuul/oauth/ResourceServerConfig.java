@@ -1,6 +1,7 @@
 package com.formacionbdi.springboot.app.zuul.oauth;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -24,8 +25,7 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
-
-	@Value("${config.security.oauth.jwt.key}")
+	@Value("${config.security.oauth.jwt.key: s3cr3t}")
 	private String jwtKey;
 	
 	@Override
@@ -35,15 +35,20 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
 
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests().antMatchers("/api/security/oauth/**").permitAll()
-		.antMatchers(HttpMethod.GET, "/api/productos", "/api/items", "/api/usuarios/usuarios").permitAll()
-		.antMatchers(HttpMethod.GET, "/api/productos/{id}", 
-				"/api/items/{id}/cantidad/{cantidad}", 
-				"/api/usuarios/usuarios/{id}").hasAnyRole("ADMIN", "USER")
-		.antMatchers("/api/productos/**", "/api/items/**", "/api/usuarios/**").hasRole("ADMIN")
-		.anyRequest().authenticated()
-		.and().cors().configurationSource(corsConfigurationSource());
-		
+		http.authorizeRequests()
+				.antMatchers("/api/security/oauth/**")
+				.permitAll()
+				.antMatchers(HttpMethod.GET, "/api/products", "/api/items", "/api/users/users")
+				.permitAll()
+				.antMatchers(HttpMethod.GET, "/api/products/{id}", "/api/items/{id}/amount/{amount}", "/api/users/users/{id}")
+				.hasAnyRole("ADMIN", "USER")
+				.antMatchers("/api/products/**", "/api/items/**", "/api/users/**")
+				.hasRole("ADMIN")
+				.anyRequest()
+				.authenticated()
+				.and()
+				.cors()
+				.configurationSource(corsConfigurationSource());
 		/*
 		.antMatchers(HttpMethod.POST, "/api/productos", "/api/items", "/api/usuarios/usuarios").hasRole("ADMIN")
 		.antMatchers(HttpMethod.PUT, "/api/productos/{id}", "/api/items/{id}", "/api/usuarios/usuarios/{id}").hasRole("ADMIN")
@@ -54,8 +59,8 @@ public class ResourceServerConfig extends ResourceServerConfigurerAdapter{
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration corsConfig = new CorsConfiguration();		
-		corsConfig.setAllowedOrigins(Arrays.asList("*"));
-		corsConfig.setAllowedMethods(Arrays.asList("POSt", "GET", "PUT", "DELETE", "OPTIONS"));
+		corsConfig.setAllowedOrigins(List.of("*"));
+		corsConfig.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
 		corsConfig.setAllowCredentials(true);
 		corsConfig.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
 		

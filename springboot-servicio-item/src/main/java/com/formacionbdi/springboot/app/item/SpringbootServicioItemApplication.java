@@ -14,7 +14,6 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public class SpringbootServicioItemApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootServicioItemApplication.class, args);
 	}

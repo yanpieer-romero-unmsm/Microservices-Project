@@ -1,5 +1,6 @@
 package com.formacionbdi.springboot.app.oauth.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +12,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
+@RequiredArgsConstructor
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter{
-	
-	@Autowired
-	private UserDetailsService usuarioService;
-	
-	@Autowired
-	private AuthenticationEventPublisher eventPublisher;
-	
+	private final UserDetailsService userService;
+	private final AuthenticationEventPublisher eventPublisher;
+
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -27,14 +25,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter{
 	@Override
 	@Autowired
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(this.usuarioService).passwordEncoder(passwordEncoder())
-		.and().authenticationEventPublisher(eventPublisher);
+		auth.userDetailsService(this.userService)
+				.passwordEncoder(passwordEncoder())
+				.and()
+				.authenticationEventPublisher(eventPublisher);
 	}
 
-	@Override
 	@Bean
+	@Override
 	protected AuthenticationManager authenticationManager() throws Exception {
 		return super.authenticationManager();
 	}
-	
 }

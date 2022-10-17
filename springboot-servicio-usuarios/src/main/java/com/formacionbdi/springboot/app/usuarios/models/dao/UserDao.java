@@ -8,20 +8,18 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Usuario;
 
-@RepositoryRestResource(path="usuarios")
-public interface UsuarioDao extends PagingAndSortingRepository<Usuario, Long>{
-	
-	@RestResource(path="buscar-username")
-	public Usuario findByUsername(@Param("username") String username);
-	
+@RepositoryRestResource(path="users")
+public interface UserDao extends PagingAndSortingRepository<Usuario, Long>{
+	@RestResource(path="search-username")
+	Usuario findByUsername(@Param("username") String username);
 	@Query("select u from Usuario u where u.username=?1")
-	public Usuario obtenerPorUsername(String username);
-	
-	
-	/*Alternativa para realizar consultas a la base de datos
-	
+	Usuario obtenerPorUsername(String username);
+	/*
+	//Alternativa para realizar consultas a la base de datos
 	@Query("select u from Usuario u where u.username=?1 and u.email=?2")
-	public Usuario obtenerPorUsername(String username, String email);
-	
+	Usuario obtenerPorUsername(String username, String email);
+	//Option to get all emails from database with a native query
+	@Query(value = "select * from usuarios u where u.email=?1", nativeQuery = true)
+	Usuario getByEmail(String email);
 	*/
 }

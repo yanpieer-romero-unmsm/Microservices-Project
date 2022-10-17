@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: servicio-usuarios
+
+  profiles:
+    active: dev
+
+  cloud:
+    config:
+      uri: http://localhost:8888

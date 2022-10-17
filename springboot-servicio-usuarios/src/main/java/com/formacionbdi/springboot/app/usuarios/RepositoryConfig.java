@@ -8,11 +8,9 @@ import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Role;
 import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Usuario;
 
 @Configuration
-public class RepositorioConfig implements RepositoryRestConfigurer{
-
+public class RepositoryConfig implements RepositoryRestConfigurer{
 	@Override
 	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
 		config.exposeIdsFor(Usuario.class, Role.class);
 	}
-	
 }

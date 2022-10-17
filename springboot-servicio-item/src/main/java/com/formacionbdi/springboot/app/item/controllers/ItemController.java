@@ -44,17 +44,17 @@ public class ItemController {
 	private String texto;
 	
 	@GetMapping
-	public List<Item> listar(){
+	public List<Item> list(){
 		return itemService.findAll();
 	}
 
 	@HystrixCommand(fallbackMethod = "metodoAlternativo")
-	@GetMapping("/{id}/cantidad/{cantidad}")
-	public Item detalle(@PathVariable Long id, @PathVariable Integer cantidad) {
-		return itemService.findById(id, cantidad);
+	@GetMapping("/{id}/amount/{amount}")
+	public Item detail(@PathVariable Long id, @PathVariable Integer amount) {
+		return itemService.findById(id, amount);
 	}
 	
-	public Item metodoAlternativo(Long id, Integer cantidad) {
+	public Item alternativeMethod(Long id, Integer cantidad) {
 		Item item = new Item();
 		Producto producto = new Producto();
 		
@@ -67,8 +67,8 @@ public class ItemController {
 		return item;
 	}
 	
-	@GetMapping("/configuraciones")
-	public ResponseEntity<?> obtenerConfig(@Value("${server.port}") String puerto){
+	@GetMapping("/configurations")
+	public ResponseEntity<?> getConfig(@Value("${server.port}") String puerto){
 		
 		log.info(texto);
 		
@@ -86,19 +86,19 @@ public class ItemController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto crear(@RequestBody Producto producto) {
+	public Producto create(@RequestBody Producto producto) {
 		return itemService.save(producto);
 	}
 	
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto editar(@RequestBody Producto producto, @PathVariable Long id) {
+	public Producto update(@RequestBody Producto producto, @PathVariable Long id) {
 		return itemService.update(producto, id);
 	}
 	
 	@DeleteMapping("/{id}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void eliminar(@PathVariable Long id) {
+	public void delete(@PathVariable Long id) {
 		itemService.delete(id);
 	}
 	
