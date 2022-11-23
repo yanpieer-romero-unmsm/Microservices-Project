@@ -1,6 +1,6 @@
 spring:
   application:
-    name: servicio-oauth
+    name: service-oauth
   cloud:
     config:
       uri: http://localhost:8888
