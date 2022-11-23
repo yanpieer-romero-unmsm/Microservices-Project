@@ -1,10 +1,8 @@
 spring:
   application:
-    name: servicio-usuarios
-
+    name: service-users
   profiles:
     active: dev
-
   cloud:
     config:
       uri: http://localhost:8888

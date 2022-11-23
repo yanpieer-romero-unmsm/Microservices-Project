@@ -11,4 +11,4 @@ spring:
           #uri: file:///C:/SpringCloud/config
           uri: https://github.com/YanpieerRomero/servicio-items-config.git
           username: YanpieerRomero
-          password: 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
+          password: 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

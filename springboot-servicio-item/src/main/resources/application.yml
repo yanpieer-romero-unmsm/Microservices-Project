@@ -1,6 +1,6 @@
 spring:
   application:
-    name: servicio-items
+    name: service-items
   sleuth:
     sampler:
       probability: 1.0

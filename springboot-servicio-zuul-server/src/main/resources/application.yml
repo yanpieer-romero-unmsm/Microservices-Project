@@ -1,6 +1,6 @@
 spring:
   application:
-    name: servicio-zuul-server
+    name: service-zuul-server
   sleuth:
     sampler:
       probability: 1.0
@@ -16,16 +16,16 @@ eureka:
 zuul:
   routes:
     products:
-      service-id: servicio-productos
+      service-id: service-products
       path: /api/products/**
     items:
-      service-id: servicio-items
+      service-id: service-items
       path: /api/items/**
     users:
-      service-id: servicio-usuarios
+      service-id: service-users
       path: /api/users/**
     security:
-      service-id: servicio-oauth
+      service-id: service-oauth
       path: /api/security/**
       sensitive-headers: Cookie,Set-Cookie
 
