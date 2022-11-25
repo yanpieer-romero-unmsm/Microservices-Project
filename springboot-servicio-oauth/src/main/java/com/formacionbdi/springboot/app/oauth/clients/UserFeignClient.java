@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Usuario;
+import com.formacionbdi.springboot.app.commons.usuarios.models.entity.User;
 
 @FeignClient(name="service-users")
 public interface UserFeignClient {
 
 	@GetMapping("/users/search/search-username")
-	Usuario findByUsername(@RequestParam String username);
+    User findByUsername(@RequestParam String username);
 	
 	@PutMapping("/users/{id}")
-	Usuario update(@RequestBody Usuario usuario, @PathVariable Long id);
+    User update(@RequestBody User user, @PathVariable Long id);
 }

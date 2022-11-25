@@ -10,7 +10,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Usuario;
+import com.formacionbdi.springboot.app.commons.usuarios.models.entity.User;
 import com.formacionbdi.springboot.app.oauth.services.IUserService;
 
 import feign.FeignException;
@@ -18,10 +18,10 @@ import feign.FeignException;
 @Component
 public class AuthenticationSuccessErrorHandler implements AuthenticationEventPublisher{
 
-	private Logger log = LoggerFactory.getLogger(AuthenticationSuccessErrorHandler.class); 
+	private final Logger log = LoggerFactory.getLogger(AuthenticationSuccessErrorHandler.class);
 
 	@Autowired
-	private IUserService usuarioService;
+	private IUserService userService;
 	
 	@Autowired
 	private Environment env;
@@ -30,50 +30,47 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 	public void publishAuthenticationSuccess(Authentication authentication) {
 		
 		if(authentication.getName().equalsIgnoreCase(env.getProperty("config.security.oauth.client.id"))){
-		    return; // si es igual a frontendapp se salen del método!
+		    return;
 		}
 		
-		UserDetails user = (UserDetails) authentication.getPrincipal();
-		String mensaje = "Success Login: " + user.getUsername();
-		System.out.println(mensaje);
-		log.info(mensaje);
+		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+		String message = "Success Login: " + userDetails.getUsername();
+		System.out.println(message);
+		log.info(message);
 		
-		Usuario usuario = usuarioService.findByUsername(authentication.getName());
+		User user = userService.findByUsername(authentication.getName());
 		
-		if (usuario.getIntentos() != null && usuario.getIntentos() > 0) {
-			usuario.setIntentos(0);
-			usuarioService.update(usuario, usuario.getId());
+		if (user.getAttempts() != null && user.getAttempts() > 0) {
+			user.setAttempts(0);
+			userService.update(user, user.getId());
 		}
 	}
 
 	@Override
 	public void publishAuthenticationFailure(AuthenticationException exception, Authentication authentication) {
-		String mensaje = "Error en el Login: " + exception.getMessage();
-		log.error(mensaje);
-		System.out.println(mensaje);
+		String message = "Error Login: " + exception.getMessage();
+		log.error(message);
+		System.out.println(message);
 		
 		try {
-			Usuario usuario = usuarioService.findByUsername(authentication.getName());
+			User user = userService.findByUsername(authentication.getName());
+			if (user.getAttempts() == null) {
+				user.setAttempts(0);
+			}
+
+			log.info("Current attempts is: " + user.getAttempts());
+			user.setAttempts(user.getAttempts()+1);
+			log.info("Attempts after is from: " + user.getAttempts());
 			
-			if (usuario.getIntentos() == null) {
-				usuario.setIntentos(0);
+			if (user.getAttempts() >= 3) {
+				log.error(String.format("The user %s disabled by max tries", user.getUsername()));
+				user.setEnabled(false);
 			}
 			
-			log.info("Intentos actual es de: " + usuario.getIntentos());
-			
-			usuario.setIntentos(usuario.getIntentos()+1);
-			
-			log.info("Intentos después es de: " + usuario.getIntentos());
-			
-			if (usuario.getIntentos() >= 3) {
-				log.error(String.format("El usuario %s des-habilitado por máximos intentos", usuario.getUsername()));
-				usuario.setEnabled(false);
-			}
-			
-			usuarioService.update(usuario, usuario.getId());
-			
+			userService.update(user, user.getId());
+
 		} catch (FeignException e) {
-			log.error(String.format("El usuario %s no existe en el sistema", authentication.getName()));
+			log.error(String.format("The user %s doesn't exist in the system", authentication.getName()));
 		}
 	}
 

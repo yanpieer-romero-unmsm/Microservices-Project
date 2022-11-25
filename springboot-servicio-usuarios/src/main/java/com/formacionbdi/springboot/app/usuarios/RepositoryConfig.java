@@ -5,12 +5,12 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 
 import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Role;
-import com.formacionbdi.springboot.app.commons.usuarios.models.entity.Usuario;
+import com.formacionbdi.springboot.app.commons.usuarios.models.entity.User;
 
 @Configuration
 public class RepositoryConfig implements RepositoryRestConfigurer{
 	@Override
 	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-		config.exposeIdsFor(Usuario.class, Role.class);
+		config.exposeIdsFor(User.class, Role.class);
 	}
 }

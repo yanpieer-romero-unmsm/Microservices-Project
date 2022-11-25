@@ -1,23 +1,12 @@
 package com.formacionbdi.springboot.app.commons.usuarios.models.entity;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 @Entity
-@Table(name = "usuarios")
-public class Usuario implements Serializable {
+@Table(name = "users")
+public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -26,24 +15,24 @@ public class Usuario implements Serializable {
 	@Column(length = 60)
 	private String password;
 	private boolean enabled;
-	private String nombre;
-	private String apellido;
+	private String name;
+	private String lastname;
 	@Column(unique = true, length = 100)
 	private String email;
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "usuarios_roles",
-			joinColumns = @JoinColumn(name = "usuario_id"),
+	@JoinTable(name = "users_roles",
+			joinColumns = @JoinColumn(name = "user_id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id"),
-			uniqueConstraints = {@UniqueConstraint(columnNames = {"usuario_id", "role_id"})})
+			uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "role_id"})})
 	private List<Role> roles;
-	private Integer intentos;
+	private Integer attempts;
 
-	public Integer getIntentos() {
-		return intentos;
+	public Integer getAttempts() {
+		return attempts;
 	}
 
-	public void setIntentos(Integer intentos) {
-		this.intentos = intentos;
+	public void setAttempts(Integer attempts) {
+		this.attempts = attempts;
 	}
 
 	public List<Role> getRoles() {
@@ -86,20 +75,20 @@ public class Usuario implements Serializable {
 		this.enabled = enabled;
 	}
 
-	public String getNombre() {
-		return nombre;
+	public String getName() {
+		return name;
 	}
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public String getApellido() {
-		return apellido;
+	public String getLastname() {
+		return lastname;
 	}
 
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
+	public void setLastname(String lastname) {
+		this.lastname = lastname;
 	}
 
 	public String getEmail() {
