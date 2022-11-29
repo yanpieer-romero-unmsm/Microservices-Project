@@ -1,7 +1,9 @@
 package com.formacionbdi.springboot.app.oauth.security.event;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.formacionbdi.springboot.app.commons.usuarios.models.entity.UserEntity;
+import com.formacionbdi.springboot.app.oauth.services.IUserService;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationEventPublisher;
@@ -10,19 +12,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.formacionbdi.springboot.app.commons.usuarios.models.entity.User;
-import com.formacionbdi.springboot.app.oauth.services.IUserService;
-
-import feign.FeignException;
-
+@Slf4j
 @Component
 public class AuthenticationSuccessErrorHandler implements AuthenticationEventPublisher{
-
-	private final Logger log = LoggerFactory.getLogger(AuthenticationSuccessErrorHandler.class);
-
 	@Autowired
 	private IUserService userService;
-	
 	@Autowired
 	private Environment env;
 	
@@ -38,11 +32,11 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 		System.out.println(message);
 		log.info(message);
 		
-		User user = userService.findByUsername(authentication.getName());
+		UserEntity userEntity = userService.findByUsername(authentication.getName());
 		
-		if (user.getAttempts() != null && user.getAttempts() > 0) {
-			user.setAttempts(0);
-			userService.update(user, user.getId());
+		if (userEntity.getAttempts() != null && userEntity.getAttempts() > 0) {
+			userEntity.setAttempts(0);
+			userService.update(userEntity, userEntity.getId());
 		}
 	}
 
@@ -53,25 +47,24 @@ public class AuthenticationSuccessErrorHandler implements AuthenticationEventPub
 		System.out.println(message);
 		
 		try {
-			User user = userService.findByUsername(authentication.getName());
-			if (user.getAttempts() == null) {
-				user.setAttempts(0);
+			UserEntity userEntity = userService.findByUsername(authentication.getName());
+			if (userEntity.getAttempts() == null) {
+				userEntity.setAttempts(0);
 			}
 
-			log.info("Current attempts is: " + user.getAttempts());
-			user.setAttempts(user.getAttempts()+1);
-			log.info("Attempts after is from: " + user.getAttempts());
+			log.info("Current attempts is: " + userEntity.getAttempts());
+			userEntity.setAttempts(userEntity.getAttempts()+1);
+			log.info("Attempts after is from: " + userEntity.getAttempts());
 			
-			if (user.getAttempts() >= 3) {
-				log.error(String.format("The user %s disabled by max tries", user.getUsername()));
-				user.setEnabled(false);
+			if (userEntity.getAttempts() >= 3) {
+				log.error(String.format("The user %s disabled by max tries", userEntity.getUsername()));
+				userEntity.setEnabled(false);
 			}
 			
-			userService.update(user, user.getId());
+			userService.update(userEntity, userEntity.getId());
 
 		} catch (FeignException e) {
 			log.error(String.format("The user %s doesn't exist in the system", authentication.getName()));
 		}
 	}
-
 }

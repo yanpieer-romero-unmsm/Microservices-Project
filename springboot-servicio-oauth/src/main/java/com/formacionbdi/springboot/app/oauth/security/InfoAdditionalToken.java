@@ -1,6 +1,6 @@
 package com.formacionbdi.springboot.app.oauth.security;
 
-import com.formacionbdi.springboot.app.commons.usuarios.models.entity.User;
+import com.formacionbdi.springboot.app.commons.usuarios.models.entity.UserEntity;
 import com.formacionbdi.springboot.app.oauth.services.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
@@ -20,10 +20,10 @@ public class InfoAdditionalToken implements TokenEnhancer{
 	@Override
 	public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
 		Map<String, Object> info = new HashMap<>();
-		User user = userService.findByUsername(authentication.getName());
-		info.put("name", user.getName());
-		info.put("lastname", user.getLastname());
-		info.put("email", user.getEmail());
+		UserEntity userEntity = userService.findByUsername(authentication.getName());
+		info.put("name", userEntity.getName());
+		info.put("lastname", userEntity.getLastname());
+		info.put("email", userEntity.getEmail());
 		((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(info);
 		return accessToken;
 	}

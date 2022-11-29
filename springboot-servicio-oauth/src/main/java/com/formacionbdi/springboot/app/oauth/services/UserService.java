@@ -1,13 +1,13 @@
 package com.formacionbdi.springboot.app.oauth.services;
 
-import com.formacionbdi.springboot.app.commons.usuarios.models.entity.User;
+import com.formacionbdi.springboot.app.commons.usuarios.models.entity.UserEntity;
 import com.formacionbdi.springboot.app.oauth.clients.UserFeignClient;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,25 +16,25 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService, UserDetailsService {
-	private final Logger log = LoggerFactory.getLogger(UserService.class);
 	private final UserFeignClient client;
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		try {
-			User user = client.findByUsername(username);
-			List<GrantedAuthority> authorities = user.getRoles().stream()
+			UserEntity userEntity = client.findByUsername(username);
+			List<GrantedAuthority> authorities = userEntity.getRoles().stream()
 					.map(role -> new SimpleGrantedAuthority(role.getName()))
 					.peek(authority -> log.info("Role: {}", authority.getAuthority()))
 					.collect(Collectors.toList());
 			log.info("Authenticated user: {}", username);
 
-			return new org.springframework.security.core.userdetails.User(user.getUsername(),
-					user.getPassword(),
-					user.getEnabled(),
+			return new User(userEntity.getUsername(),
+					userEntity.getPassword(),
+					userEntity.isEnabled(),
 					true,
 					true,
 					true,
@@ -46,12 +46,12 @@ public class UserService implements IUserService, UserDetailsService {
 	}
 
 	@Override
-	public User findByUsername(String username) {
+	public UserEntity findByUsername(String username) {
 		return client.findByUsername(username);
 	}
 
 	@Override
-	public User update(User user, Long id) {
-		return client.update(user, id);
+	public UserEntity update(UserEntity userEntity, Long id) {
+		return client.update(userEntity, id);
 	}
 }
