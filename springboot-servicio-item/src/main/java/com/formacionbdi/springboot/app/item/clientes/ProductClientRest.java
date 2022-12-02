@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(name = "servicio-productos")
-public interface ProductoClienteRest {
+@FeignClient(name = "service-products")
+public interface ProductClientRest {
 	@GetMapping
 	List<ProductEntity> list();
 	@GetMapping("/{id}")

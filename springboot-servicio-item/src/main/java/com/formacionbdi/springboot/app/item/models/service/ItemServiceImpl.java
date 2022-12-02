@@ -1,61 +1,56 @@
 package com.formacionbdi.springboot.app.item.models.service;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import com.formacionbdi.springboot.app.commons.models.entity.ProductEntity;
+import com.formacionbdi.springboot.app.item.models.Item;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.formacionbdi.springboot.app.item.models.Item;
-import com.formacionbdi.springboot.app.commons.models.entity.Producto;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service("serviceRestTemplate")
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService{
-	
-	@Autowired
-	private RestTemplate clienteRest;
+	private final RestTemplate clientRest;
 	
 	@Override
 	public List<Item> findAll() {
-		List<Producto> productos = Arrays.asList(clienteRest.getForObject("http://servicio-productos", Producto[].class));
+		List<ProductEntity> productEntities = Arrays.asList(Objects.requireNonNull(clientRest.getForObject("http://service-products", ProductEntity[].class)));
 		
-		return productos.stream().map(p -> new Item(p, 1)).collect(Collectors.toList());
+		return productEntities.stream()
+				.map(p -> new Item(p, 1))
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Item findById(Long id, Integer cantidad) {
+	public Item findById(Long id, Integer amount) {
 		Map<String, String> pathVariables = new HashMap<String, String>();
 		pathVariables.put("id", id.toString());
-		Producto producto = clienteRest.getForObject("http://servicio-productos/{id}", Producto.class, pathVariables);
-		return new Item(producto, cantidad);
+		ProductEntity productEntity = clientRest.getForObject("http://service-products/{id}", ProductEntity.class, pathVariables);
+		return new Item(productEntity, amount);
 	}
 
 	@Override
-	public Producto save(Producto producto) {
-		HttpEntity<Producto> body = new HttpEntity<Producto>(producto);
+	public ProductEntity save(ProductEntity productEntity) {
+		HttpEntity<ProductEntity> body = new HttpEntity<ProductEntity>(productEntity);
 		
-		ResponseEntity<Producto> response = clienteRest.exchange("http://servicio-productos", HttpMethod.POST, body, Producto.class);
-		
-		Producto productoResponse = response.getBody();
-		
-		return productoResponse;
+		ResponseEntity<ProductEntity> response = clientRest.exchange("http://service-products", HttpMethod.POST, body, ProductEntity.class);
+
+		return response.getBody();
 	}
 
 	@Override
-	public Producto update(Producto producto, Long id) {
+	public ProductEntity update(ProductEntity productEntity, Long id) {
 		Map<String, String> pathVariables = new HashMap<String, String>();
 		pathVariables.put("id", id.toString());
 		
-		HttpEntity<Producto> body = new HttpEntity<Producto>(producto);
-		ResponseEntity<Producto> response = clienteRest.exchange("http://servicio-productos/{id}", 
-				HttpMethod.PUT, body, Producto.class, pathVariables);
+		HttpEntity<ProductEntity> body = new HttpEntity<ProductEntity>(productEntity);
+		ResponseEntity<ProductEntity> response = clientRest.exchange("http://service-products/{id}",
+				HttpMethod.PUT, body, ProductEntity.class, pathVariables);
 		
 		return response.getBody();
 	}
@@ -64,7 +59,7 @@ public class ItemServiceImpl implements ItemService{
 	public void delete(Long id) {
 		Map<String, String> pathVariables = new HashMap<String, String>();
 		pathVariables.put("id", id.toString());
-		clienteRest.delete("http://servicio-productos/{id}", pathVariables);
+		clientRest.delete("http://service-products/{id}", pathVariables);
 		
 	}
 

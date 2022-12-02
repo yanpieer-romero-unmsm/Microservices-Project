@@ -1,20 +1,14 @@
 package com.formacionbdi.springboot.app.item.models.service;
 
+import com.formacionbdi.springboot.app.commons.models.entity.ProductEntity;
+import com.formacionbdi.springboot.app.item.models.Item;
+
 import java.util.List;
 
-import com.formacionbdi.springboot.app.item.models.Item;
-import com.formacionbdi.springboot.app.commons.models.entity.Producto;
-
 public interface ItemService {
-
-	public List<Item> findAll();
-
-	public Item findById(Long id, Integer cantidad);
-	
-	public Producto save(Producto producto);
-	
-	public Producto update(Producto producto, Long id);
-	
-	public void delete(Long id);
-	
+	List<Item> findAll();
+	Item findById(Long id, Integer amount);
+	ProductEntity save(ProductEntity productEntity);
+	ProductEntity update(ProductEntity productEntity, Long id);
+	void delete(Long id);
 }

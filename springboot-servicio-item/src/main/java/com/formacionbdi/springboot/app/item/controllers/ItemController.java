@@ -1,11 +1,10 @@
 package com.formacionbdi.springboot.app.item.controllers;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.formacionbdi.springboot.app.commons.models.entity.ProductEntity;
+import com.formacionbdi.springboot.app.item.models.Item;
+import com.formacionbdi.springboot.app.item.models.service.ItemService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,26 +12,16 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.formacionbdi.springboot.app.item.models.Item;
-import com.formacionbdi.springboot.app.commons.models.entity.Producto;
-import com.formacionbdi.springboot.app.item.models.service.ItemService;
-import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RefreshScope
 @RestController
 public class ItemController {
-	
-	private static Logger log = LoggerFactory.getLogger("ItemController");
-	
 	@Autowired
 	private Environment env;
 	
@@ -40,45 +29,45 @@ public class ItemController {
 	@Qualifier("serviceFeign")
 	private ItemService itemService;
 	
-	@Value("${configuracion.texto}")
-	private String texto;
+	@Value("${configuration.text: Configuring development environment ...}")
+	private String text;
 	
 	@GetMapping
 	public List<Item> list(){
 		return itemService.findAll();
 	}
 
-	@HystrixCommand(fallbackMethod = "metodoAlternativo")
+	@HystrixCommand(fallbackMethod = "alternativeMethod")
 	@GetMapping("/{id}/amount/{amount}")
 	public Item detail(@PathVariable Long id, @PathVariable Integer amount) {
 		return itemService.findById(id, amount);
 	}
 	
-	public Item alternativeMethod(Long id, Integer cantidad) {
+	public Item alternativeMethod(Long id, Integer amount) {
 		Item item = new Item();
-		Producto producto = new Producto();
+		ProductEntity productEntity = new ProductEntity();
 		
-		item.setCantidad(cantidad);
-		producto.setId(id);
-		producto.setNombre("Camara Sony");
-		producto.setPrecio(500.00);
-		item.setProducto(producto);
+		item.setAmount(amount);
+		productEntity.setId(id);
+		productEntity.setName("Camara Sony");
+		productEntity.setPrice(500.00);
+		item.setProductEntity(productEntity);
 		
 		return item;
 	}
 	
 	@GetMapping("/configurations")
-	public ResponseEntity<?> getConfig(@Value("${server.port}") String puerto){
+	public ResponseEntity<?> getConfig(@Value("${server.port}") String port){
 		
-		log.info(texto);
+		log.info(text);
 		
 		Map<String, String> json = new HashMap<>();
-		json.put("texto", texto);
-		json.put("puerto", puerto);
+		json.put("text", text);
+		json.put("port", port);
 		
 		if(env.getActiveProfiles().length > 0 && env.getActiveProfiles()[0].equals("dev")) {
-			json.put("autor.nombre", env.getProperty("configuracion.autor.nombre"));
-			json.put("autor.email", env.getProperty("configuracion.autor.email"));
+			json.put("author.name", env.getProperty("configuration.author.name"));
+			json.put("author.email", env.getProperty("configuration.author.email"));
 		}
 		
 		return new ResponseEntity<Map<String, String>>(json, HttpStatus.OK);
@@ -86,14 +75,14 @@ public class ItemController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto create(@RequestBody Producto producto) {
-		return itemService.save(producto);
+	public ProductEntity create(@RequestBody ProductEntity productEntity) {
+		return itemService.save(productEntity);
 	}
 	
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto update(@RequestBody Producto producto, @PathVariable Long id) {
-		return itemService.update(producto, id);
+	public ProductEntity update(@RequestBody ProductEntity productEntity, @PathVariable Long id) {
+		return itemService.update(productEntity, id);
 	}
 	
 	@DeleteMapping("/{id}")

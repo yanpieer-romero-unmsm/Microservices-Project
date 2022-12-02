@@ -1,38 +1,18 @@
 package com.formacionbdi.springboot.app.item.models;
 
-import com.formacionbdi.springboot.app.commons.models.entity.Producto;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.formacionbdi.springboot.app.commons.models.entity.ProductEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Item {
-
-	private Producto producto;
-	private Integer cantidad;
-
-	public Item() {
-	}
-
-	public Item(Producto producto, Integer cantidad) {
-		this.producto = producto;
-		this.cantidad = cantidad;
-	}
-
-	public Producto getProducto() {
-		return producto;
-	}
-
-	public void setProducto(Producto producto) {
-		this.producto = producto;
-	}
-
-	public Integer getCantidad() {
-		return cantidad;
-	}
-
-	public void setCantidad(Integer cantidad) {
-		this.cantidad = cantidad;
-	}
-
-	public Double getTotal() {
-		return producto.getPrecio() * cantidad.doubleValue();
-	}
-	
+	@JsonProperty("product")
+	private ProductEntity productEntity;
+	private Integer amount;
 }

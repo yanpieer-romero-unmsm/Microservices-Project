@@ -9,6 +9,6 @@ spring:
       server:
         git:
           #uri: file:///C:/SpringCloud/config
-          uri: https://github.com/YanpieerRomero/servicio-items-config.git
+          uri: https://github.com/YanpieerRomero/configurations.git
           username: YanpieerRomero
-          password: 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
+          password:

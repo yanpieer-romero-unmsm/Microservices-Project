@@ -1,68 +1,49 @@
 package com.formacionbdi.springboot.app.productos.controllers;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
+import com.formacionbdi.springboot.app.commons.models.entity.ProductEntity;
+import com.formacionbdi.springboot.app.productos.models.service.IProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.formacionbdi.springboot.app.commons.models.entity.Producto;
-import com.formacionbdi.springboot.app.productos.models.service.IProductService;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class ProductController {
-	//private final Environment env;
 	private final IProductService productService;
 	@Value("${server.port}")
 	private Integer port;
 
 	@GetMapping
-	public List<Producto> list(){
-		return productService.findAll().stream().map(product -> {
-			//producto.setPort(Integer.parseInt(env.getProperty("local.server.port")));
-			product.setPort(port);
-			return product;
-		}).collect(Collectors.toList());
+	public List<ProductEntity> list(){
+		return productService.findAll()
+				.stream()
+				.peek(product -> product.setPort(port))
+				.collect(Collectors.toList());
 	}
 	
 	@GetMapping("/{id}")
-	public Producto detail(@PathVariable Long id)  {
-		Producto product = productService.findById(id);
-		//producto.setPort(Integer.parseInt(env.getProperty("local.server.port")));
+	public ProductEntity detail(@PathVariable Long id)  {
+		ProductEntity product = productService.findById(id);
 		product.setPort(port);
-		/*
-		try {
-			Thread.sleep(2000L);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
 		return product;
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto create(@RequestBody Producto product) {
+	public ProductEntity create(@RequestBody ProductEntity product) {
 		return productService.save(product);
 	}
 	
 	@PutMapping("/{id}")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Producto editar(@RequestBody Producto product, @PathVariable Long id) {
-		Producto productDb = productService.findById(id);
-		productDb.setNombre(product.getNombre());
-		productDb.setPrecio(product.getPrecio());
+	public ProductEntity update(@RequestBody ProductEntity product, @PathVariable Long id) {
+		ProductEntity productDb = productService.findById(id);
+		productDb.setName(product.getName());
+		productDb.setPrice(product.getPrice());
 		return productService.save(productDb);
 	}
 	
@@ -71,5 +52,4 @@ public class ProductController {
 	public void delete(@PathVariable Long id) {
 		productService.deleteById(id);
 	}
-	
 }
