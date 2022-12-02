@@ -26,7 +26,8 @@ public class UserService implements IUserService, UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		try {
 			UserEntity userEntity = client.findByUsername(username);
-			List<GrantedAuthority> authorities = userEntity.getRoles().stream()
+			List<GrantedAuthority> authorities = userEntity.getRoles()
+					.stream()
 					.map(role -> new SimpleGrantedAuthority(role.getName()))
 					.peek(authority -> log.info("Role: {}", authority.getAuthority()))
 					.collect(Collectors.toList());
