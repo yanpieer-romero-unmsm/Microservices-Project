@@ -33,7 +33,9 @@ public class ItemController {
 	private String text;
 	
 	@GetMapping
-	public List<Item> list(){
+	public List<Item> list(@RequestParam(name = "name", required = false) String name, @RequestHeader(name = "token-request", required = false) String token){
+		log.info(name);
+		log.info(token);
 		return itemService.findAll();
 	}
 

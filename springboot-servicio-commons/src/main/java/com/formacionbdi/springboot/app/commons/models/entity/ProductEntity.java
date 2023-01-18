@@ -7,6 +7,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
+import static javax.persistence.GenerationType.IDENTITY;
+import static javax.persistence.TemporalType.DATE;
+
 @Getter
 @Setter
 @Entity
@@ -18,12 +21,12 @@ public class ProductEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 1285454306356845809L;
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = IDENTITY)
 	private Long id;
 	private String name;
 	private Double price;
 	@Column(name = "create_at")
-	@Temporal(TemporalType.DATE)
+	@Temporal(DATE)
 	private Date createAt;
 	@Transient
 	private Integer port;
