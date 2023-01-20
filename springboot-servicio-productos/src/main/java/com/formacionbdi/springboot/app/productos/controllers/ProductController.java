@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,7 +27,13 @@ public class ProductController {
 	}
 	
 	@GetMapping("/{id}")
-	public ProductEntity detail(@PathVariable Long id)  {
+	public ProductEntity detail(@PathVariable Long id) throws InterruptedException {
+		if (id.equals(10L))
+			throw new IllegalStateException("Product not found");
+
+		if (id.equals(7L))
+			TimeUnit.SECONDS.sleep(5L);
+
 		ProductEntity product = productService.findById(id);
 		product.setPort(port);
 		return product;
