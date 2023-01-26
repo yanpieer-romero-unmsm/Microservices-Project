@@ -3,6 +3,8 @@ package com.formacionbdi.springboot.app.item.controllers;
 import com.formacionbdi.springboot.app.commons.models.entity.ProductEntity;
 import com.formacionbdi.springboot.app.item.models.Item;
 import com.formacionbdi.springboot.app.item.models.service.ItemService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RefreshScope
@@ -39,11 +42,23 @@ public class ItemController {
 		return itemService.findAll();
 	}
 
-	//@HystrixCommand(fallbackMethod = "alternativeMethod")
 	@GetMapping("/{id}/amount/{amount}")
 	public Item detail(@PathVariable Long id, @PathVariable Integer amount) {
 		return circuitBreakerFactory.create("items")
 				.run(() -> itemService.findById(id, amount), e -> alternativeMethod(id, amount, e));
+	}
+
+	@CircuitBreaker(name = "items", fallbackMethod = "alternativeMethod")
+	@GetMapping("/test/v1/{id}/amount/{amount}")
+	public Item detailCircuitBreakerVersion1(@PathVariable Long id, @PathVariable Integer amount) {
+		return itemService.findById(id, amount);
+	}
+
+	@CircuitBreaker(name = "items", fallbackMethod = "alternativeMethodVersion2")
+	@TimeLimiter(name = "items")
+	@GetMapping("/test/v2/{id}/amount/{amount}")
+	public CompletableFuture<Item> detailCircuitBreakerVersion2(@PathVariable Long id, @PathVariable Integer amount) {
+		return CompletableFuture.supplyAsync(() -> itemService.findById(id, amount));
 	}
 
 	public Item alternativeMethod(Long id, Integer amount, Throwable e) {
@@ -58,6 +73,20 @@ public class ItemController {
 		item.setProductEntity(productEntity);
 
 		return item;
+	}
+
+	public CompletableFuture<Item> alternativeMethodVersion2(Long id, Integer amount, Throwable e) {
+		log.info(e.getMessage());
+		Item item = new Item();
+		ProductEntity productEntity = new ProductEntity();
+
+		item.setAmount(amount);
+		productEntity.setId(id);
+		productEntity.setName("Camara Sony");
+		productEntity.setPrice(500.00);
+		item.setProductEntity(productEntity);
+
+		return CompletableFuture.supplyAsync(() -> item);
 	}
 
 	@GetMapping("/configurations")
