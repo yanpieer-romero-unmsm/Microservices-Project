@@ -90,20 +90,17 @@ public class ItemController {
 	}
 
 	@GetMapping("/configurations")
-	public ResponseEntity<?> getConfig(@Value("${server.port}") String port){
-
+	public ResponseEntity<Map<String, String>> getConfig(@Value("${server.port}") String port){
 		log.info(text);
-
 		Map<String, String> json = new HashMap<>();
 		json.put("text", text);
 		json.put("port", port);
-
+		log.info(env.getActiveProfiles()[0]);
 		if(env.getActiveProfiles().length > 0 && env.getActiveProfiles()[0].equals("dev")) {
 			json.put("author.name", env.getProperty("configuration.author.name"));
 			json.put("author.email", env.getProperty("configuration.author.email"));
 		}
-
-		return new ResponseEntity<Map<String, String>>(json, HttpStatus.OK);
+		return new ResponseEntity<>(json, HttpStatus.OK);
 	}
 
 	@PostMapping
